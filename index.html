@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevToolsHub — 직무별 도구 사전</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #222636;
+      --border: #2e3348;
+      --text: #e4e6f0;
+      --muted: #7c82a0;
+      --dev: #6366f1;
+      --ai: #10b981;
+      --dba: #f59e0b;
+      --radius: 12px;
+      --gap: 20px;
+    }
+
+    body {
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0f1117 0%, #1a1d27 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 32px 40px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--dev), var(--ai), var(--dba));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-left: 4px;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 360px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #search {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      padding: 10px 14px 10px 40px;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    #search:focus { border-color: var(--dev); }
+    #search::placeholder { color: var(--muted); }
+
+    .tab-group {
+      display: flex;
+      gap: 6px;
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .tab {
+      padding: 7px 16px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .tab:hover { color: var(--text); background: var(--border); }
+    .tab.active { color: #fff; background: var(--active-color, var(--dev)); }
+
+    .count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    #tool-count { color: var(--text); font-weight: 600; }
+
+    /* ── Main Layout ── */
+    main {
+      padding: 32px 40px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid;
+    }
+
+    .section-icon { font-size: 24px; }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .section-tool-count {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── Category Block ── */
+    .category-block {
+      margin-bottom: 32px;
+    }
+
+    .category-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      padding-left: 4px;
+    }
+
+    /* ── Tool Grid ── */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--gap);
+    }
+
+    /* ── Tool Card ── */
+    .tool-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      transition: transform .18s, box-shadow .18s, border-color .18s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--dev));
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.4);
+      border-color: var(--card-accent, var(--dev));
+    }
+
+    .tool-card:hover::before { opacity: 1; }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .tool-logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 6px;
+    }
+
+    .tool-logo-placeholder {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .tool-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .tool-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+    }
+    .empty-state .emoji { font-size: 48px; margin-bottom: 16px; }
+    .empty-state p { font-size: 16px; }
+
+    /* ── Hidden ── */
+    .hidden { display: none !important; }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      header { padding: 20px; }
+      main { padding: 20px; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .logo { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <span class="logo">DevToolsHub</span>
+    <span class="subtitle">직무별 도구 사전</span>
+  </div>
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input id="search" type="search" placeholder="도구 이름 또는 키워드 검색…" autocomplete="off" />
+    </div>
+    <div class="tab-group" id="tab-group">
+      <button class="tab active" data-filter="all" style="--active-color:#6366f1">전체</button>
+      <button class="tab" data-filter="dev" style="--active-color:#6366f1">💻 개발</button>
+      <button class="tab" data-filter="ai" style="--active-color:#10b981">🤖 AI / ML</button>
+      <button class="tab" data-filter="dba" style="--active-color:#f59e0b">🗄️ DBA</button>
+    </div>
+    <div class="count-badge">
+      <span id="tool-count">0</span>&nbsp;개 도구
+    </div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<script src="data.js"></script>
+<script>
+  const main = document.getElementById('main');
+  const searchEl = document.getElementById('search');
+  const toolCountEl = document.getElementById('tool-count');
+
+  let currentFilter = 'all';
+  let currentQuery = '';
+
+  function hashColor(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+    const hue = Math.abs(h) % 360;
+    return `hsl(${hue}, 60%, 50%)`;
+  }
+
+  function logoEl(tool, accent) {
+    if (tool.logo) {
+      return `<img class="tool-logo" src="${tool.logo}" alt="${tool.name}" onerror="this.replaceWith(makePlaceholder('${tool.name}','${accent}'))" />`;
+    }
+    const initials = tool.name.split(/[\s/]/)[0].slice(0, 2).toUpperCase();
+    return `<div class="tool-logo-placeholder" style="background:${accent}22;color:${accent}">${initials}</div>`;
+  }
+
+  function highlight(text, q) {
+    if (!q) return text;
+    const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(re, '<mark style="background:#6366f133;color:#a5b4fc;border-radius:2px">$1</mark>');
+  }
+
+  function matches(tool, q) {
+    if (!q) return true;
+    const haystack = [tool.name, tool.desc, ...(tool.tags || [])].join(' ').toLowerCase();
+    return haystack.includes(q.toLowerCase());
+  }
+
+  function render() {
+    const q = currentQuery.trim();
+    main.innerHTML = '';
+
+    let totalVisible = 0;
+    let hasAny = false;
+
+    Object.entries(toolsData).forEach(([key, domain]) => {
+      if (currentFilter !== 'all' && currentFilter !== key) return;
+
+      let domainVisible = 0;
+      const catBlocks = [];
+
+      domain.categories.forEach(cat => {
+        const visibleTools = cat.tools.filter(t => matches(t, q));
+        if (!visibleTools.length) return;
+
+        const cards = visibleTools.map(tool => {
+          const accent = domain.color;
+          return `
+            <div class="tool-card" style="--card-accent:${accent}">
+              <div class="card-head">
+                ${logoEl(tool, accent)}
+                <span class="tool-name">${highlight(tool.name, q)}</span>
+              </div>
+              <p class="tool-desc">${highlight(tool.desc, q)}</p>
+              <div class="tag-list">
+                ${(tool.tags || []).map(t => `<span class="tag">${highlight(t, q)}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        domainVisible += visibleTools.length;
+
+        catBlocks.push(`
+          <div class="category-block" data-cat="${cat.name}">
+            <div class="category-label">${cat.name}</div>
+            <div class="tool-grid">${cards}</div>
+          </div>
+        `);
+      });
+
+      if (!domainVisible) return;
+      totalVisible += domainVisible;
+      hasAny = true;
+
+      const sectionColor = domain.color;
+      main.insertAdjacentHTML('beforeend', `
+        <section class="section" data-domain="${key}">
+          <div class="section-header" style="border-color:${sectionColor}">
+            <span class="section-icon">${domain.icon}</span>
+            <span class="section-title" style="color:${sectionColor}">${domain.label}</span>
+            <span class="section-tool-count">${domainVisible}개 도구</span>
+          </div>
+          ${catBlocks.join('')}
+        </section>
+      `);
+    });
+
+    if (!hasAny) {
+      main.innerHTML = `
+        <div class="empty-state">
+          <div class="emoji">🔎</div>
+          <p>"<strong>${q}</strong>"에 해당하는 도구를 찾지 못했습니다.</p>
+        </div>
+      `;
+    }
+
+    toolCountEl.textContent = totalVisible;
+  }
+
+  // Tab switching
+  document.getElementById('tab-group').addEventListener('click', e => {
+    const btn = e.target.closest('.tab');
+    if (!btn) return;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+
+  // Search
+  searchEl.addEventListener('input', e => {
+    currentQuery = e.target.value;
+    render();
+  });
+
+  // Init
+  render();
+</script>
+</body>
+</html>
